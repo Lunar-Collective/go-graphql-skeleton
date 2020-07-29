@@ -1,0 +1,13 @@
+version: "3"
+
+
+services:
+  app:
+    build: .
+    volumes:
+      - ./:/root/app
+    env_file:
+      - .env
+    command: air -d
+    ports:
+      - 8042:80
