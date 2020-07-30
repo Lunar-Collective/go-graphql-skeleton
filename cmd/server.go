@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"github.com/Lunar-Collective/go-graphql-skeleton/store"
 	"log"
 	"net/http"
 	"os"
@@ -15,12 +17,25 @@ const defaultPort = "80"
 
 func main() {
 	port := os.Getenv("PORT")
+	dbName := os.Getenv("DB_NAME")
+	dbHost := os.Getenv(("DB_HOST"))
 	
 	if port == "" {
 		port = defaultPort
 	}
 
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
+	// Add new background context
+	ctx := context.Background()
+
+	db, err := store.ArangoInit(ctx, dbHost, dbName)
+
+	if err != nil {
+		panic(err)
+	}
+
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{
+		ArangoDB: db,
+	}}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", srv)
