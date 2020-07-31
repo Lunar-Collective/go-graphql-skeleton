@@ -8,4 +8,5 @@ import "github.com/arangodb/go-driver"
 
 type Resolver struct{
 	ArangoDB driver.Database
+	CheckScope func(scope, authDomain, token string) bool
 }
